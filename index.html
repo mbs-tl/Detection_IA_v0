@@ -152,7 +152,9 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIv2QgH6vGyC6YZ4ecA2rlZ5jxG4gloXzWhr7yCpupw9p4GdCxJi10xlFozPr_qNDVxg/exec";
-        const REPO_PATH = "mbs-tl/Detection_IA_v0"; 
+        const REPO_PATH = "mbs-tl/Detection_IA_v0";
+
+
         const REASONS = [
             { id: 'lighting', label: 'Éclairage' },
             { id: 'background', label: 'Arrière-plan' },
@@ -173,6 +175,7 @@
                 currentIdx: 0,
                 timeLeft: 20,
                 timer: null,
+                startTime: null,
                 prediction: null,
                 selectedReasons: [],
                 confidence: 50,
@@ -223,18 +226,21 @@
                         else alert("Plus d'images de remplacement.");
                     }
                     this.isKnowledgeCheck = false;
-                    this.resetTimer();
+                    this.resetTimer(); // Reinitialise et démarre le compteur à 20s
                 },
 
                 resetTimer() {
                     clearInterval(this.timer);
-                    if (this.isKnowledgeCheck) return;
-                    this.timeLeft = 20;
+                    this.timeLeft = 20; // Visuellement à 20s immédiatement
+                    
+                    if (this.isKnowledgeCheck) return; // Ne décompte pas pendant le "Connaissez-vous cette image"
+                    
+                    this.startTime = Date.now(); // Pour un calcul précis du temps de réponse
                     this.timer = setInterval(() => {
                         this.timeLeft--;
                         if (this.timeLeft <= 0) {
                             clearInterval(this.timer);
-                            this.nextImage(true); // Temps écoulé
+                            this.nextImage(true);
                         }
                     }, 1000);
                 },
@@ -247,7 +253,6 @@
                 nextImage(isTimeout = false) {
                     if (!isTimeout && !this.prediction) return alert("Veuillez choisir Réelle ou IA");
                     
-                    // Envoi à Google Sheet
                     this.saveResult(isTimeout ? "Pas de réponse" : this.prediction);
 
                     this.currentIdx++;
@@ -259,11 +264,14 @@
                         this.selectedReasons = [];
                         this.confidence = 50;
                         this.isKnowledgeCheck = true;
-                        this.resetTimer();
+                        this.resetTimer(); // Remet à 20s pour la prochaine image (en attente du knowledge check)
                     }
                 },
 
                 saveResult(pred) {
+                    // Calcul précis du temps écoulé
+                    const elapsed = this.startTime ? (Date.now() - this.startTime) / 1000 : 20;
+                    
                     const data = {
                         date: new Date().toLocaleString('fr-FR'),
                         email: this.userData.email,
@@ -273,7 +281,7 @@
                         img_url: this.currentImage.url,
                         type: this.currentImage.type,
                         prediction: pred,
-                        temps_rep: (20 - this.timeLeft).toFixed(2),
+                        temps_rep: elapsed.toFixed(2), // Format 4.98 par exemple
                         raison: this.selectedReasons.join(', '),
                         confiance: this.confidence
                     };
