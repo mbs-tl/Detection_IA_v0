@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Detection Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        [x-cloak] { display: none !important; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 min-h-screen flex items-center justify-center p-4" x-data="testApp()">
+
+    <!-- ÉCRAN DE CHARGEMENT -->
+    <template x-if="screen === 'loading'">
+        <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-4"></div>
+            <p class="text-zinc-600 font-medium text-sm">Chargement des images depuis GitHub...</p>
+        </div>
+    </template>
+
+    <!-- ÉCRAN D'ERREUR -->
+    <template x-if="screen === 'error'">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-red-100 text-center">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="alert-circle" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-xl font-bold text-zinc-900 mb-2">Erreur de chargement</h2>
+            <p class="text-zinc-500 text-sm mb-6" x-text="errorMessage"></p>
+            <button @click="location.reload()"
+                    class="w-full bg-zinc-900 text-white font-bold py-3 rounded-xl">
+                Réessayer
+            </button>
+        </div>
+    </template>
+
+    <!-- ÉCRAN D'INTRODUCTION (STYLE ORIGINAL RESTAURÉ) -->
+    <template x-if="screen === 'intro'">
+        <div class="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8 border border-zinc-100">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="p-4 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-200">
+                    <i data-lucide="brain-circuit" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-zinc-900">Test de Détection d'Images IA</h1>
+                    <p class="text-zinc-500">Étude de recherche sur la perception visuelle</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- CONSIGNES -->
+                <div class="space-y-6">
+                    <h2 class="text-lg font-semibold text-zinc-800 flex items-center gap-2">
+                        <i data-lucide="info" class="w-5 h-5 text-indigo-600"></i>
+                        Consignes
+                    </h2>
+                    <ul class="space-y-4 text-zinc-600 text-sm">
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                            <span>Vous allez voir une série d'images une par une.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                            <span>Pour chaque image, indiquez si elle est <b>réelle</b> ou <b>générée par IA</b>.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                            <span>Indiquez votre niveau de confiance pour chaque réponse.</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                            <span>Le test est anonyme et prend environ 2 minutes.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- FORMULAIRE -->
+                <div class="space-y-4 bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
+                    <h2 class="text-lg font-semibold text-zinc-800 mb-2">Vos informations</h2>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Âge</label>
+                            <input type="number" x-model="userData.age" placeholder="Ex: 25"
+                                   class="w-full px-4 py-2 rounded-xl border border-zinc-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Sexe</label>
+                            <select x-model="userData.sex" class="w-full px-4 py-2 rounded-xl border border-zinc-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                                <option value="male">Homme</option>
+                                <option value="female">Femme</option>
+                                <option value="other">Autre</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider">E-mail</label>
+                            <input type="email" x-model="userData.email" placeholder="votre@email.com"
+                                   class="w-full px-4 py-2 rounded-xl border border-zinc-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Expertise</label>
+                            <input type="text" x-model="userData.expertise" placeholder="Ex: Photographe, Étudiant..."
+                                   class="w-full px-4 py-2 rounded-xl border border-zinc-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button @click="startTest()"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2">
+                Commencer l'expérience
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </template>
+
+    <!-- ÉCRAN DE TEST -->
+    <template x-if="screen === 'test'">
+        <div class="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="relative">
+                <div class="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+                    <i data-lucide="clock" class="w-4 h-4 text-zinc-600"></i>
+                    <span class="font-mono font-bold text-zinc-900" x-text="timeLeft + 's'"></span>
+                </div>
+
+                <div class="aspect-[4/3] rounded-3xl overflow-hidden bg-zinc-200 shadow-2xl border-4 border-white relative">
+                    <img :src="currentImage.url" class="w-full h-full object-cover">
+                </div>
+
+                <div class="mt-4 flex justify-between items-center px-2">
+                    <span class="text-sm font-medium text-zinc-400" x-text="'Image ' + (currentIdx + 1) + ' sur ' + images.length"></span>
+                    <span x-show="replacedCount > 0" class="text-xs bg-amber-50 text-amber-600 px-2 py-1 rounded-md font-medium" x-text="replacedCount + ' image(s) remplacée(s)'"></span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl p-8 border border-zinc-100 flex flex-col relative min-h-[500px]">
+                <div x-show="isKnowledgeCheck" x-transition class="flex-1 flex flex-col justify-center text-center">
+                    <div class="p-6 bg-indigo-50 rounded-3xl mb-6">
+                        <i data-lucide="eye" class="w-12 h-12 text-indigo-600 mx-auto mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Connaissez-vous cette image ?</h3>
+                        <p class="text-zinc-500 text-sm">Si oui, nous la remplacerons par une nouvelle image pour garantir l'impartialité du test.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <button @click="handleKnowledge(true)"
+                                class="bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2">
+                            Oui, je la connais
+                        </button>
+                        <button @click="handleKnowledge(false)"
+                                class="bg-white border-2 border-zinc-100 text-zinc-900 font-bold py-4 rounded-2xl hover:bg-zinc-50 transition-all">
+                            Non, jamais vue
+                        </button>
+                    </div>
+                </div>
+
+                <div x-show="!isKnowledgeCheck" x-transition class="flex-1 flex flex-col" x-cloak>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-6 flex items-center gap-2">
+                        <i data-lucide="info" class="w-5 h-5 text-indigo-500"></i>
+                        Réelle ou IA ?
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <button @click="prediction = 'real'"
+                                :class="prediction === 'real' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-inner' : 'bg-white border-zinc-100 text-zinc-400'"
+                                class="py-4 rounded-2xl font-bold flex flex-col items-center gap-2 border-2 transition-all">
+                            <i data-lucide="check-circle-2" class="w-6 h-6"></i> Réelle
+                        </button>
+
+                        <button @click="prediction = 'ai'"
+                                :class="prediction === 'ai' ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-inner' : 'bg-white border-zinc-100 text-zinc-400'"
+                                class="py-4 rounded-2xl font-bold flex flex-col items-center gap-2 border-2 transition-all">
+                            <i data-lucide="brain" class="w-6 h-6"></i> IA
+                        </button>
+                    </div>
+
+                    <div x-show="prediction === 'ai'" x-transition class="mb-8">
+                        <p class="text-sm font-semibold text-zinc-700 mb-3">Pourquoi pensez-vous que c'est une IA ?</p>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="r in REASONS" :key="r.id">
+                                <button @click="toggleReason(r.id)"
+                                        :class="selectedReasons.includes(r.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-zinc-50 border-zinc-200 text-zinc-600'"
+                                        class="px-3 py-2 rounded-xl text-xs font-medium border transition-all"
+                                        x-text="r.label"></button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm font-semibold text-zinc-700">Confiance</label>
+                            <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg" x-text="confidence + '%'"></span>
+                        </div>
+                        <input type="range" min="0" max="100" x-model="confidence"
+                               class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <button @click="nextImage()"
+                            class="mt-auto w-full bg-zinc-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2">
+                        Suivant
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ÉCRAN DE FIN -->
+    <template x-if="screen === 'finish'">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-12 text-center border border-zinc-100">
+            <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-zinc-900 mb-4">Test Terminé</h2>
+            <p class="text-zinc-500 mb-8">Merci pour votre participation ! Vos réponses ont été enregistrées.</p>
+            <button @click="location.reload()"
+                    class="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2">
+                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                Recommencer
+            </button>
+        </div>
+    </template>
+
+    <script>
+        // CONFIGURATION
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzToVQ5J6Z-IuFmEdL21tli-CqhRfT35-CjCdzKmJd4KExe8lcR3-7W3yG6CwfVf8Uqaw/exec";
+        const REPO_PATH = "mbs-tl/Detection_IA_v0"; 
+
+        const REASONS = [
+            { id: 'lighting', label: 'Éclairage / Style' },
+            { id: 'background', label: 'Arrière-plan' },
+            { id: 'anatomy', label: 'Anatomie' },
+            { id: 'objects', label: 'Objets' },
+            { id: 'cohesiveness', label: 'Cohérence' },
+            { id: 'textures', label: 'Textures' },
+            { id: 'other', label: 'Autre' }
+        ];
+
+        function testApp() {
+            return {
+                screen: 'loading',
+                userData: { age: '', sex: 'male', email: '', expertise: '' },
+                images: [],
+                poolReal: [],
+                poolIA: [],
+                currentIdx: 0,
+                timeLeft: 20,
+                timer: null,
+                prediction: null,
+                selectedReasons: [],
+                confidence: 50,
+                isKnowledgeCheck: true,
+                replacedCount: 0,
+                REASONS: REASONS,
+                errorMessage: '',
+
+                get currentImage() {
+                    return this.images[this.currentIdx] || { url: '', type: '' };
+                },
+
+                async init() {
+                    try {
+                        const fetchFolder = async (path, type) => {
+                            const res = await fetch(`https://api.github.com/repos/${REPO_PATH}/contents/${path}`);
+                            if (!res.ok) throw new Error(`Dossier introuvable: ${path}`);
+                            const files = await res.json();
+                            return files
+                                .filter(f => f.type === "file" && /\.(jpe?g|png|webp)$/i.test(f.name))
+                                .map(f => ({ url: f.download_url, type }));
+                        };
+
+                        const [reelles, ia, r_reelles, r_ia] = await Promise.all([
+                            fetchFolder('im_real', 'real'),
+                            fetchFolder('im_ia', 'ai'),
+                            fetchFolder('remplacement_im_real', 'real'),
+                            fetchFolder('remplacement_im_ia', 'ai')
+                        ]);
+
+                        if (reelles.length === 0 && ia.length === 0) {
+                            throw new Error("Aucune image trouvée dans les dossiers im_real ou im_ia.");
+                        }
+
+                        this.images = [...reelles, ...ia].sort(() => Math.random() - 0.5);
+                        this.poolReal = r_reelles.map(img => img.url).sort(() => Math.random() - 0.5);
+                        this.poolIA = r_ia.map(img => img.url).sort(() => Math.random() - 0.5);
+
+                        this.screen = 'intro';
+                    } catch (err) {
+                        console.error("Erreur:", err.message);
+                        this.errorMessage = err.message;
+                        this.screen = 'error';
+                    }
+
+                    this.$watch('screen', val => {
+                        if (['test', 'intro', 'finish', 'error'].includes(val)) {
+                            setTimeout(() => lucide.createIcons(), 50);
+                        }
+                    });
+                },
+
+                startTest() {
+                    if (!this.userData.age || !this.userData.email || !this.userData.expertise) {
+                        return alert("Veuillez remplir tous les champs.");
+                    }
+                    this.screen = 'test';
+                    this.resetTimer();
+                },
+
+                handleKnowledge(known) {
+                    if (known) {
+                        const type = this.currentImage.type;
+                        let newUrl = null;
+
+                        if (type === 'real' && this.poolReal.length > 0) {
+                            newUrl = this.poolReal.pop();
+                        } else if (type === 'ai' && this.poolIA.length > 0) {
+                            newUrl = this.poolIA.pop();
+                        }
+
+                        if (newUrl) {
+                            this.images[this.currentIdx].url = newUrl;
+                            this.replacedCount++;
+                        } else {
+                            alert("Plus d'images de remplacement disponibles pour cette catégorie.");
+                        }
+                    }
+                    this.isKnowledgeCheck = false;
+                    this.resetTimer();
+                },
+
+                resetTimer() {
+                    clearInterval(this.timer);
+                    if (this.isKnowledgeCheck) return;
+                    this.timeLeft = 20;
+                    this.timer = setInterval(() => {
+                        this.timeLeft--;
+                        if (this.timeLeft <= 0) {
+                            clearInterval(this.timer);
+                            this.nextImage(true);
+                        }
+                    }, 1000);
+                },
+
+                toggleReason(id) {
+                    if (this.selectedReasons.includes(id)) {
+                        this.selectedReasons = this.selectedReasons.filter(x => x !== id);
+                    } else {
+                        this.selectedReasons.push(id);
+                    }
+                },
+
+                nextImage(isAuto = false) {
+                    if (!isAuto) {
+                        if (!this.prediction) return alert("Veuillez choisir Réelle ou IA");
+                        if (this.prediction === 'ai' && this.selectedReasons.length === 0) return alert("Veuillez sélectionner au moins une raison");
+                        this.saveResult(this.prediction);
+                    } else {
+                        this.saveResult('no_rep');
+                    }
+
+                    this.currentIdx++;
+                    if (this.currentIdx >= this.images.length) {
+                        clearInterval(this.timer);
+                        this.screen = 'finish';
+                    } else {
+                        this.prediction = null;
+                        this.selectedReasons = [];
+                        this.confidence = 50;
+                        this.isKnowledgeCheck = true;
+                        this.resetTimer();
+                    }
+                },
+
+                saveResult(pred) {
+                    const data = {
+                        ...this.userData,
+                        image_url: this.currentImage.url,
+                        true_type: this.currentImage.type,
+                        prediction: pred,
+                        reasons: this.selectedReasons.join(','),
+                        confidence: this.confidence,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    fetch(SCRIPT_URL, {
+                        method: "POST",
+                        mode: 'no-cors',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    }).catch(e => console.error("Erreur d'envoi :", e));
+                }
+            }
+        }
+    </script>
+</body>
+</html>
