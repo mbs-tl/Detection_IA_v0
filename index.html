@@ -34,7 +34,7 @@
                         <h2 class="text-white font-bold mb-3 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5"></i> Votre tâche</h2>
                         <p class="text-sm leading-relaxed">
                             Vous allez voir des images. Votre tâche est de dire si l’image est <b>réelle</b> ou <b>générée par une IA</b>.<br><br>
-                            Il n’y a aucune bonne ou mauvaise réponse : nous étudions des tendances globales.
+                            L'image disparaîtra dès que vous cliquerez sur "Répondre".
                         </p>
                     </div>
                     <div class="space-y-4">
@@ -42,7 +42,7 @@
                         <ul class="text-sm space-y-3">
                             <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">1</span> <span>Identifiez si l'image est réelle ou générée par IA.</span></li>
                             <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">2</span> <span>Vous avez <b>30 secondes</b> par image.</span></li>
-                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">3</span> <span>Cliquez sur "Répondre" dès que vous avez une idée.</span></li>
+                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">3</span> <span>L'image est masquée pendant votre réponse.</span></li>
                         </ul>
                     </div>
                 </div>
@@ -55,14 +55,6 @@
                         <div><label class="label-text">Âge</label><input type="number" x-model="userData.age" class="input-field" placeholder="Ex: 25"></div>
                         <div><label class="label-text">Sexe</label><select x-model="userData.sex" class="input-field"><option value="Homme">Homme</option><option value="Femme">Femme</option><option value="Autre">Autre</option></select></div>
                         <div><label class="label-text">Expertise</label><input type="text" x-model="userData.expertise" class="input-field" placeholder="Ex: Data"></div>
-                    </div>
-                    <hr class="border-zinc-100">
-                    <div class="space-y-4">
-                        <div><label class="label-text">Sommeil (0-10)</label><input type="range" min="0" max="10" x-model="userData.sleep" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer"></div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="label-text">Alcool ?</label><select x-model="userData.alcohol" class="input-field"><option value="non">Non</option><option value="oui">Oui</option></select></div>
-                            <div><label class="label-text">Fatigue (0-10)</label><input type="range" min="0" max="10" x-model="userData.fatigue" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer"></div>
-                        </div>
                     </div>
                     <button @click="startTest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2">
                         Valider et Commencer <i data-lucide="play" class="w-5 h-5"></i>
@@ -80,8 +72,13 @@
                     <i data-lucide="clock" class="w-4 h-4 text-zinc-600"></i>
                     <span class="font-mono font-bold" x-text="timeLeft + 's'"></span>
                 </div>
-                <div class="aspect-[4/3] rounded-3xl overflow-hidden bg-zinc-200 shadow-2xl border-4 border-white">
-                    <img :src="currentImage.url" class="w-full h-full object-cover">
+                <!-- IMAGE MASQUÉE SI RÉPONSE EN COURS -->
+                <div class="aspect-[4/3] rounded-3xl overflow-hidden bg-zinc-200 shadow-2xl border-4 border-white flex items-center justify-center">
+                    <img x-show="!isResponding" :src="currentImage.url" class="w-full h-full object-cover">
+                    <div x-show="isResponding" class="text-zinc-400 flex flex-col items-center gap-2" x-cloak>
+                        <i data-lucide="eye-off" class="w-12 h-12"></i>
+                        <span class="font-bold uppercase tracking-widest text-xs">Image Masquée</span>
+                    </div>
                 </div>
                 <div class="mt-4 flex justify-between items-center px-2">
                     <span class="text-sm font-medium text-zinc-400" x-text="'Image ' + (currentIdx + 1) + ' / ' + images.length"></span>
@@ -109,10 +106,21 @@
                     </div>
                     <div x-show="!isKnowledgeCheck" class="flex-1 flex flex-col">
                         <h2 class="text-xl font-bold mb-6">Réelle ou IA ?</h2>
-                        <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
                             <button @click="prediction = 'Réelle'" :class="prediction === 'Réelle' ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">Réelle</button>
                             <button @click="prediction = 'IA'" :class="prediction === 'IA' ? 'bg-amber-50 border-amber-500 text-amber-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">IA</button>
                         </div>
+
+                        <!-- OPTIONS POURQUOI IA -->
+                        <div x-show="prediction === 'IA'" class="mb-6" x-cloak>
+                            <p class="text-sm font-bold mb-3 text-zinc-500 uppercase">Pourquoi ?</p>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="r in REASONS" :key="r.id">
+                                    <button @click="toggleReason(r.label)" :class="selectedReasons.includes(r.label) ? 'bg-indigo-600 text-white' : 'bg-zinc-50 text-zinc-600'" class="px-3 py-2 rounded-xl text-xs font-medium border" x-text="r.label"></button>
+                                </template>
+                            </div>
+                        </div>
+
                         <div class="space-y-4 mb-8">
                             <div class="flex justify-between items-center text-sm font-bold"><label>Confiance</label><span class="text-indigo-600" x-text="confidence + '%'"></span></div>
                             <input type="range" min="0" max="100" x-model="confidence" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
@@ -124,7 +132,7 @@
         </div>
     </template>
 
-    <!-- SONDAGE FINAL -->
+    <!-- SONDAGE FINAL (Inchangé) -->
     <template x-if="screen === 'survey'">
         <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-zinc-100">
             <h2 class="text-2xl font-bold mb-8 text-center">Quelques questions finales</h2>
@@ -164,6 +172,12 @@
         const SCRIPT_URL_RESULTS = "https://script.google.com/macros/s/AKfycbxIv2QgH6vGyC6YZ4ecA2rlZ5jxG4gloXzWhr7yCpupw9p4GdCxJi10xlFozPr_qNDVxg/exec";
         const SCRIPT_URL_USER = "https://script.google.com/macros/s/AKfycbzE8O5gHoTdxEBb4ZKnUTzyespapgeFI1IHDFhydjjRFXCiyx17A02zbkV3Bv28rrVVIA/exec";
         const REPO_PATH = "mbs-tl/Detection_IA_v0";
+        const REASONS = [
+            { id: 'lighting', label: 'Éclairage' }, { id: 'background', label: 'Arrière-plan' },
+            { id: 'anatomy', label: 'Anatomie' }, { id: 'objects', label: 'Objets' },
+            { id: 'cohesiveness', label: 'Cohérence' }, { id: 'textures', label: 'Textures' },
+            { id: 'other', label: 'Autre' }
+        ];
 
         function testApp() {
             return {
@@ -171,7 +185,7 @@
                 userData: { age: '', sex: 'Homme', email: '', expertise: '', sleep: 5, alcohol: 'non', meds: 'non', fatigue: 5, illness: 'non', focus: 5 },
                 surveyData: { difficulty: 'Moyenne', enoughTime: 'Oui' },
                 images: [], poolReal: [], poolIA: [], currentIdx: 0, timeLeft: 30, timer: null, startTime: null, responseTime: null,
-                prediction: null, confidence: 50, isKnowledgeCheck: true, isResponding: false, errorMessage: '',
+                prediction: null, selectedReasons: [], confidence: 50, isKnowledgeCheck: true, isResponding: false, errorMessage: '', REASONS: REASONS,
 
                 get currentImage() { return this.images[this.currentIdx] || { url: '', type: '' }; },
 
@@ -213,6 +227,7 @@
                 handleRespondClick() {
                     this.responseTime = (Date.now() - this.startTime) / 1000;
                     this.isResponding = true;
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 handleKnowledge(known) {
@@ -223,12 +238,17 @@
                     this.isKnowledgeCheck = false;
                 },
 
+                toggleReason(label) {
+                    if (this.selectedReasons.includes(label)) this.selectedReasons = this.selectedReasons.filter(x => x !== label);
+                    else this.selectedReasons.push(label);
+                },
+
                 nextImage(isTimeout = false) {
                     if (!isTimeout && !this.prediction && this.isResponding) return alert("Choisissez Réelle ou IA");
                     this.saveResult(isTimeout ? "Timeout" : this.prediction);
                     this.currentIdx++;
                     if (this.currentIdx >= this.images.length) { clearInterval(this.timer); this.screen = 'survey'; }
-                    else { this.isResponding = false; this.isKnowledgeCheck = true; this.prediction = null; this.startTimer(); }
+                    else { this.isResponding = false; this.isKnowledgeCheck = true; this.prediction = null; this.selectedReasons = []; this.startTimer(); }
                     this.$nextTick(() => lucide.createIcons());
                 },
 
@@ -236,7 +256,8 @@
                     const data = {
                         date: new Date().toLocaleString('fr-FR'),
                         email: this.userData.email, img_url: this.currentImage.url, type: this.currentImage.type,
-                        prediction: pred, temps_rep: this.responseTime ? this.responseTime.toFixed(2) : "30.00", confiance: this.confidence
+                        prediction: pred, temps_rep: this.responseTime ? this.responseTime.toFixed(2) : "30.00", 
+                        raison: this.selectedReasons.join(', '), confiance: this.confidence
                     };
                     fetch(SCRIPT_URL_RESULTS, { method: "POST", mode: 'no-cors', body: JSON.stringify(data) });
                 },
