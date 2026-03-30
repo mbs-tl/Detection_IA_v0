@@ -261,7 +261,7 @@
                 screen: 'loading',
                 errorMessage: '',
                 REPO_PATH: "mbs-tl/Detection_IA_v0",
-                SCRIPT_URL_RESULTS: "https://script.google.com/macros/s/AKfycbxIv2QgH6vGyC6YZ4ecA2rlZ5jxG4gloXzWhr7yCpupw9p4GdCxJi10xlFozPr_qNDVxg/exec",
+                SCRIPT_URL_RESULTS: "https://script.google.com/macros/s/AKfycbIv2QgH6vGyC6YZ4ecA2rlZ5jxG4gloXzWhr7yCpupw9p4GdCxJi10xlFozPr_qNDVxg/exec",
                 SCRIPT_URL_USER: "https://script.google.com/macros/s/AKfycbyF2XnzjnyGqEDieZTC5WRdfnMo7nJ_CZhuC0fztkYZ3qcVa75aiVm-ecl2JdfYfib-UA/exec",
                 
                 userData: { email: '', age: '', sex: 'Homme', expertise: '', sleep: 5, alcohol: 'non', meds: 'non', fatigue: 5, focus: 5 },
@@ -357,7 +357,7 @@
                             this.images[this.currentIdx].url = newUrl;
                             // Reset to Phase 1 for the replacement image
                             this.isResponding = false;
-                            this.isKnowledgeCheck = true;
+                            this.isKnowledgeCheck = false; // On saute la vérification pour l'image de remplacement
                             this.startTimer();
                             this.$nextTick(() => lucide.createIcons());
                             return;
