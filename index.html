@@ -3,28 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Detection Test</title>
+    <title>Étude de Perception - Détection d'Images IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         [x-cloak] { display: none !important; }
-        .input-field { @apply w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white; }
-        .label-text { @apply text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block; }
     </style>
 </head>
 <body class="bg-zinc-50 text-zinc-900 min-h-screen flex items-center justify-center p-4" x-data="testApp()">
 
     <!-- CHARGEMENT / ERREUR -->
-    <template x-if="screen === 'loading'"><div class="text-center"><div class="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div><p class="text-zinc-600">Chargement...</p></div></template>
-    <template x-if="screen === 'error'"><div class="text-center p-8 bg-white rounded-3xl shadow-xl"><i data-lucide="alert-circle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i><p x-text="errorMessage"></p><button @click="location.reload()" class="mt-4 bg-zinc-900 text-white px-6 py-2 rounded-xl">Réessayer</button></div></template>
+    <template x-if="screen === 'loading'">
+        <div class="text-center">
+            <div class="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p class="text-zinc-600 font-medium">Chargement des ressources...</p>
+        </div>
+    </template>
+
+    <template x-if="screen === 'error'">
+        <div class="text-center p-8 bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden max-w-md">
+            <i data-lucide="alert-circle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i>
+            <p class="text-zinc-800 font-medium" x-text="errorMessage"></p>
+            <button @click="window.location.reload()" class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 px-8">Réessayer</button>
+        </div>
+    </template>
 
     <!-- INTRODUCTION -->
     <template x-if="screen === 'intro'">
-        <div class="w-full max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-zinc-100 flex flex-col md:flex-row">
-            <div class="md:w-1/2 p-8 md:p-12 bg-indigo-600 text-white">
+        <div class="w-full max-w-6xl bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden flex flex-col md:flex-row">
+            <div class="md:w-1/2 p-8 md:p-12 bg-indigo-600 text-white flex flex-col justify-center">
                 <div class="flex items-center gap-3 mb-8">
                     <i data-lucide="brain-circuit" class="w-10 h-10"></i>
                     <h1 class="text-3xl font-bold">Étude de Perception</h1>
@@ -33,30 +43,92 @@
                     <div class="bg-indigo-700/50 p-6 rounded-2xl border border-indigo-400/30">
                         <h2 class="text-white font-bold mb-3 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5"></i> Votre tâche</h2>
                         <p class="text-sm leading-relaxed">
-                            Vous allez voir des images. Votre tâche est de dire si l’image est <b>réelle</b> ou <b>générée par une IA</b>.<br><br>
-                            L'image disparaîtra dès que vous cliquerez sur "Répondre".
+                            Vous allez voir des images. Votre tâche est de dire si l’image est <b>réelle</b> ou <b>générée/modifiée par une IA</b>.<br /><br />
+                            Faites de votre mieux. Il n’y a aucune bonne ou mauvaise réponse individuelle : nous étudions des tendances globales.
                         </p>
                     </div>
                     <div class="space-y-4">
                         <h2 class="text-white font-bold flex items-center gap-2"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Consignes</h2>
                         <ul class="text-sm space-y-3">
                             <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">1</span> <span>Identifiez si l'image est réelle ou générée par IA.</span></li>
-                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">2</span> <span>Vous avez <b>30 secondes</b> par image.</span></li>
-                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">3</span> <span>L'image est masquée pendant votre réponse.</span></li>
+                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">2</span> <span>Vous avez 30 secondes par image.</span></li>
+                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">3</span> <span>Cliquez sur "Répondre" dès que vous avez une idée. L'image disparaîtra alors.</span></li>
                         </ul>
                     </div>
+                    <p class="text-xs italic opacity-70 mt-8">Tout sera anonymisé ! Votre mail sert uniquement à la validation.</p>
                 </div>
             </div>
+
             <div class="md:w-1/2 p-8 md:p-12 overflow-y-auto max-h-[90vh]">
                 <h2 class="text-2xl font-bold mb-6">Questionnaire initial</h2>
                 <div class="space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label class="label-text">E-mail</label><input type="email" x-model="userData.email" class="input-field" placeholder="votre@email.com"></div>
-                        <div><label class="label-text">Âge</label><input type="number" x-model="userData.age" class="input-field" placeholder="Ex: 25"></div>
-                        <div><label class="label-text">Sexe</label><select x-model="userData.sex" class="input-field"><option value="Homme">Homme</option><option value="Femme">Femme</option><option value="Autre">Autre</option></select></div>
-                        <div><label class="label-text">Expertise</label><input type="text" x-model="userData.expertise" class="input-field" placeholder="Ex: Data"></div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">E-mail</label>
+                            <input type="email" x-model="userData.email" class="w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white transition-all" placeholder="votre@email.com">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Âge</label>
+                            <input type="number" x-model="userData.age" class="w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white transition-all" placeholder="Ex: 25">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Sexe</label>
+                            <select x-model="userData.sex" class="w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white transition-all">
+                                <option value="Homme">Homme</option>
+                                <option value="Femme">Femme</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Expertise</label>
+                            <input type="text" x-model="userData.expertise" class="w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white transition-all" placeholder="Ex: Data">
+                        </div>
                     </div>
-                    <button @click="startTest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2">
+
+                    <hr class="border-zinc-100">
+                    <p class="text-sm font-bold text-indigo-600">Au cours des dernières 24 heures...</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Sommeil suffisant ? (0-10)</label>
+                            <div class="flex items-center gap-4">
+                                <input type="range" min="0" max="10" x-model="userData.sleep" class="flex-1 h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                                <span class="w-8 text-center font-bold text-indigo-600" x-text="userData.sleep"></span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Alcool ?</label>
+                                <select x-model="userData.alcohol" class="w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white transition-all">
+                                    <option value="non">Non</option>
+                                    <option value="oui">Oui</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Médocs ?</label>
+                                <select x-model="userData.meds" class="w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white transition-all">
+                                    <option value="non">Non</option>
+                                    <option value="oui">Oui</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Niveau de fatigue ? (0-10)</label>
+                            <div class="flex items-center gap-4">
+                                <input type="range" min="0" max="10" x-model="userData.fatigue" class="flex-1 h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                                <span class="w-8 text-center font-bold text-indigo-600" x-text="userData.fatigue"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Niveau de concentration ? (0-10)</label>
+                            <div class="flex items-center gap-4">
+                                <input type="range" min="0" max="10" x-model="userData.focus" class="flex-1 h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                                <span class="w-8 text-center font-bold text-indigo-600" x-text="userData.focus"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button @click="startTest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
                         Valider et Commencer <i data-lucide="play" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -64,7 +136,7 @@
         </div>
     </template>
 
-    <!-- TEST SCREEN -->
+    <!-- TEST -->
     <template x-if="screen === 'test'">
         <div class="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="relative">
@@ -72,155 +144,201 @@
                     <i data-lucide="clock" class="w-4 h-4 text-zinc-600"></i>
                     <span class="font-mono font-bold" x-text="timeLeft + 's'"></span>
                 </div>
-                <!-- IMAGE MASQUÉE SI RÉPONSE EN COURS -->
                 <div class="aspect-[4/3] rounded-3xl overflow-hidden bg-zinc-200 shadow-2xl border-4 border-white flex items-center justify-center">
-                    <img x-show="!isResponding" :src="currentImage.url" class="w-full h-full object-cover">
-                    <div x-show="isResponding" class="text-zinc-400 flex flex-col items-center gap-2" x-cloak>
-                        <i data-lucide="eye-off" class="w-12 h-12"></i>
-                        <span class="font-bold uppercase tracking-widest text-xs">Image Masquée</span>
-                    </div>
+                    <template x-if="!isResponding">
+                        <img :src="currentImage.url" class="w-full h-full object-cover" alt="Test">
+                    </template>
+                    <template x-if="isResponding">
+                        <div class="text-zinc-400 flex flex-col items-center gap-2">
+                            <i data-lucide="eye-off" class="w-12 h-12"></i>
+                            <span class="font-bold uppercase tracking-widest text-xs">Image Masquée</span>
+                        </div>
+                    </template>
                 </div>
                 <div class="mt-4 flex justify-between items-center px-2">
                     <span class="text-sm font-medium text-zinc-400" x-text="'Image ' + (currentIdx + 1) + ' / ' + images.length"></span>
                 </div>
             </div>
 
-            <div class="bg-white rounded-3xl shadow-xl p-8 border border-zinc-100 flex flex-col min-h-[500px]">
-                <!-- PHASE 1 : BOUTON RÉPONDRE -->
-                <div x-show="!isResponding" class="flex-1 flex flex-col justify-center items-center text-center space-y-6">
-                    <h3 class="text-2xl font-bold">Analysez l'image</h3>
-                    <p class="text-zinc-500">Cliquez sur le bouton dès que vous avez une idée.</p>
-                    <button @click="handleRespondClick()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-2xl shadow-xl text-xl">
-                        Répondre
-                    </button>
-                </div>
-
-                <!-- PHASE 2 : QUESTIONS -->
-                <div x-show="isResponding" class="flex-1 flex flex-col" x-cloak>
-                    <div x-show="isKnowledgeCheck" class="flex-1 flex flex-col justify-center text-center">
-                        <h3 class="text-xl font-bold mb-6">Connaissez-vous cette image ?</h3>
-                        <div class="grid grid-cols-1 gap-4">
-                            <button @click="handleKnowledge(true)" class="bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg">Oui, je la connais</button>
-                            <button @click="handleKnowledge(false)" class="bg-white border-2 border-zinc-100 font-bold py-4 rounded-2xl">Non, jamais vue</button>
-                        </div>
+            <div class="bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden p-8 flex flex-col min-h-[500px]">
+                <template x-if="!isResponding">
+                    <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6">
+                        <h3 class="text-2xl font-bold">Analysez l'image</h3>
+                        <p class="text-zinc-500">Cliquez sur le bouton dès que vous êtes prêt à donner votre avis.</p>
+                        <button @click="handleRespondClick()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 text-xl">Répondre</button>
                     </div>
-                    <div x-show="!isKnowledgeCheck" class="flex-1 flex flex-col">
-                        <h2 class="text-xl font-bold mb-6">Réelle ou IA ?</h2>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <button @click="prediction = 'Réelle'" :class="prediction === 'Réelle' ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">Réelle</button>
-                            <button @click="prediction = 'IA'" :class="prediction === 'IA' ? 'bg-amber-50 border-amber-500 text-amber-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">IA</button>
-                        </div>
+                </template>
 
-                        <!-- OPTIONS POURQUOI IA -->
-                        <div x-show="prediction === 'IA'" class="mb-6" x-cloak>
-                            <p class="text-sm font-bold mb-3 text-zinc-500 uppercase">Pourquoi ?</p>
-                            <div class="flex flex-wrap gap-2">
-                                <template x-for="r in REASONS" :key="r.id">
-                                    <button @click="toggleReason(r.label)" :class="selectedReasons.includes(r.label) ? 'bg-indigo-600 text-white' : 'bg-zinc-50 text-zinc-600'" class="px-3 py-2 rounded-xl text-xs font-medium border" x-text="r.label"></button>
-                                </template>
+                <template x-if="isResponding">
+                    <div class="flex-1 flex flex-col">
+                        <template x-if="isKnowledgeCheck">
+                            <div class="flex-1 flex flex-col justify-center text-center">
+                                <h3 class="text-xl font-bold mb-6">Connaissez-vous cette image ?</h3>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <button @click="handleKnowledge(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">Oui, je la connais</button>
+                                    <button @click="handleKnowledge(false)" class="bg-white border-2 border-zinc-100 hover:border-zinc-200 text-zinc-600 font-bold py-4 rounded-2xl transition-all active:scale-95">Non, jamais vue</button>
+                                </div>
                             </div>
-                        </div>
+                        </template>
 
-                        <div class="space-y-4 mb-8">
-                            <div class="flex justify-between items-center text-sm font-bold"><label>Confiance</label><span class="text-indigo-600" x-text="confidence + '%'"></span></div>
-                            <input type="range" min="0" max="100" x-model="confidence" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <button @click="nextImage(false)" class="mt-auto w-full bg-zinc-900 text-white font-bold py-4 rounded-2xl">Suivant</button>
+                        <template x-if="!isKnowledgeCheck">
+                            <div class="flex-1 flex flex-col">
+                                <h2 class="text-xl font-bold mb-6">Réelle ou IA ?</h2>
+                                <div class="grid grid-cols-2 gap-4 mb-8">
+                                    <button @click="prediction = 'Réelle'" :class="prediction === 'Réelle' ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">Réelle</button>
+                                    <button @click="prediction = 'IA'" :class="prediction === 'IA' ? 'bg-amber-50 border-amber-500 text-amber-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">IA</button>
+                                </div>
+
+                                <template x-if="prediction === 'IA'">
+                                    <div class="mb-8">
+                                        <p class="text-sm font-bold mb-3 text-zinc-500 uppercase">Pourquoi ?</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <template x-for="r in reasons" :key="r.id">
+                                                <button @click="toggleReason(r.label)" :class="selectedReasons.includes(r.label) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-zinc-50 text-zinc-600 border-zinc-200'" class="px-3 py-2 rounded-xl text-xs font-medium border transition-colors" x-text="r.label"></button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <div class="space-y-4 mb-8">
+                                    <div class="flex justify-between items-center text-sm font-bold">
+                                        <label class="text-zinc-500 uppercase">Confiance</label>
+                                        <span class="text-indigo-600" x-text="confidence + '%'"></span>
+                                    </div>
+                                    <input type="range" min="0" max="100" x-model="confidence" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                                </div>
+
+                                <button @click="nextImage()" class="mt-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
+                                    Suivant <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </template>
                     </div>
-                </div>
+                </template>
             </div>
         </div>
     </template>
 
-    <!-- SONDAGE FINAL (Inchangé) -->
+    <!-- SURVEY -->
     <template x-if="screen === 'survey'">
-        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-zinc-100">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden p-8">
             <h2 class="text-2xl font-bold mb-8 text-center">Quelques questions finales</h2>
             <div class="space-y-8">
                 <div>
-                    <label class="label-text block mb-4">Avez-vous trouvé ce test :</label>
+                    <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block block mb-4">Avez-vous trouvé ce test :</label>
                     <div class="grid grid-cols-3 gap-2">
                         <template x-for="opt in ['Facile', 'Moyenne', 'Difficile']">
-                            <button @click="surveyData.difficulty = opt" :class="surveyData.difficulty === opt ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-3 rounded-xl text-sm font-bold border-2" x-text="opt"></button>
+                            <button @click="surveyData.difficulty = opt" :class="surveyData.difficulty === opt ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-3 rounded-xl text-sm font-bold border-2 transition-all" x-text="opt"></button>
                         </template>
                     </div>
                 </div>
                 <div>
-                    <label class="label-text block mb-4">Avez-vous eu suffisamment de temps ?</label>
+                    <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block block mb-4">Avez-vous eu suffisamment de temps ?</label>
                     <div class="grid grid-cols-2 gap-2">
                         <template x-for="opt in ['Oui', 'Non']">
-                            <button @click="surveyData.enoughTime = opt" :class="surveyData.enoughTime === opt ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-3 rounded-xl text-sm font-bold border-2" x-text="opt"></button>
+                            <button @click="surveyData.enoughTime = opt" :class="surveyData.enoughTime === opt ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-3 rounded-xl text-sm font-bold border-2 transition-all" x-text="opt"></button>
                         </template>
                     </div>
                 </div>
-                <button @click="finishTest()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg mt-4">Terminer l'étude</button>
+                <button @click="finishTest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 mt-4">Terminer l'étude</button>
             </div>
         </div>
     </template>
 
-    <!-- FIN -->
+    <!-- FINISH -->
     <template x-if="screen === 'finish'">
-        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-12 text-center border border-zinc-100">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden p-12 text-center">
             <i data-lucide="check-circle-2" class="w-16 h-16 text-emerald-500 mx-auto mb-6"></i>
             <h2 class="text-3xl font-bold mb-4">Terminé !</h2>
-            <p class="text-zinc-500 mb-8">Merci pour votre contribution.</p>
-            <button @click="location.reload()" class="w-full bg-zinc-100 font-bold py-4 rounded-xl">Recommencer</button>
+            <p class="text-zinc-500 mb-8">Merci pour votre précieuse contribution à cette étude scientifique.</p>
+            <button @click="window.location.reload()" class="w-full bg-white border-2 border-zinc-100 hover:border-zinc-200 text-zinc-600 font-bold py-4 rounded-2xl transition-all active:scale-95">Recommencer</button>
         </div>
     </template>
 
     <script>
-        const SCRIPT_URL_RESULTS = "https://script.google.com/macros/s/AKfycbxIv2QgH6vGyC6YZ4ecA2rlZ5jxG4gloXzWhr7yCpupw9p4GdCxJi10xlFozPr_qNDVxg/exec";
-        const SCRIPT_URL_USER = "https://script.google.com/macros/s/AKfycbzE8O5gHoTdxEBb4ZKnUTzyespapgeFI1IHDFhydjjRFXCiyx17A02zbkV3Bv28rrVVIA/exec";
-        const REPO_PATH = "mbs-tl/Detection_IA_v0";
-        const REASONS = [
-            { id: 'lighting', label: 'Éclairage' }, { id: 'background', label: 'Arrière-plan' },
-            { id: 'anatomy', label: 'Anatomie' }, { id: 'objects', label: 'Objets' },
-            { id: 'cohesiveness', label: 'Cohérence' }, { id: 'textures', label: 'Textures' },
-            { id: 'other', label: 'Autre' }
-        ];
-
         function testApp() {
             return {
                 screen: 'loading',
-                userData: { age: '', sex: 'Homme', email: '', expertise: '', sleep: 5, alcohol: 'non', meds: 'non', fatigue: 5, illness: 'non', focus: 5 },
+                errorMessage: '',
+                REPO_PATH: "mbs-tl/Detection_IA_v0",
+                SCRIPT_URL_RESULTS: "https://script.google.com/macros/s/AKfycbxIv2QgH6vGyC6YZ4ecA2rlZ5jxG4gloXzWhr7yCpupw9p4GdCxJi10xlFozPr_qNDVxg/exec",
+                SCRIPT_URL_USER: "https://script.google.com/macros/s/AKfycbyF2XnzjnyGqEDieZTC5WRdfnMo7nJ_CZhuC0fztkYZ3qcVa75aiVm-ecl2JdfYfib-UA/exec",
+                
+                userData: { email: '', age: '', sex: 'Homme', expertise: '', sleep: 5, alcohol: 'non', meds: 'non', fatigue: 5, focus: 5 },
                 surveyData: { difficulty: 'Moyenne', enoughTime: 'Oui' },
-                images: [], poolReal: [], poolIA: [], currentIdx: 0, timeLeft: 30, timer: null, startTime: null, responseTime: null,
-                prediction: null, selectedReasons: [], confidence: 50, isKnowledgeCheck: true, isResponding: false, errorMessage: '', REASONS: REASONS,
+                
+                images: [],
+                poolReal: [],
+                poolIA: [],
+                currentIdx: 0,
+                timeLeft: 30,
+                timer: null,
+                isResponding: false,
+                isKnowledgeCheck: true,
+                prediction: null,
+                selectedReasons: [],
+                confidence: 50,
+                startTime: null,
+                responseTime: null,
+                
+                reasons: [
+                    { id: 'lighting', label: 'Éclairage' }, { id: 'background', label: 'Arrière-plan' },
+                    { id: 'anatomy', label: 'Anatomie' }, { id: 'objects', label: 'Objets' },
+                    { id: 'cohesiveness', label: 'Cohérence' }, { id: 'textures', label: 'Textures' },
+                    { id: 'other', label: 'Autre' }
+                ],
 
-                get currentImage() { return this.images[this.currentIdx] || { url: '', type: '' }; },
+                init() {
+                    this.fetchImages();
+                },
 
-                async init() {
+                async fetchImages() {
                     try {
                         const fetchFolder = async (path, type) => {
-                            const res = await fetch(`https://api.github.com/repos/${REPO_PATH}/contents/${path}`);
+                            const res = await fetch(`https://api.github.com/repos/${this.REPO_PATH}/contents/${path}`);
+                            if (!res.ok) throw new Error(`Dossier ${path} non trouvé`);
                             const files = await res.json();
-                            return files.filter(f => /\.(jpe?g|png|webp)$/i.test(f.name)).map(f => ({ url: f.download_url, type }));
+                            return files
+                                .filter(f => /\.(jpe?g|png|webp)$/i.test(f.name))
+                                .map(f => ({ url: f.download_url, type }));
                         };
+
                         const [reelles, ia, r_reelles, r_ia] = await Promise.all([
-                            fetchFolder('im_real', 'Réelle'), fetchFolder('im_ia', 'IA'),
-                            fetchFolder('remplacement_im_real', 'Réelle'), fetchFolder('remplacement_im_ia', 'IA')
+                            fetchFolder('im_real', 'Réelle'),
+                            fetchFolder('im_ia', 'IA'),
+                            fetchFolder('remplacement_im_real', 'Réelle'),
+                            fetchFolder('remplacement_im_ia', 'IA')
                         ]);
+
                         this.images = [...reelles, ...ia].sort(() => Math.random() - 0.5);
                         this.poolReal = r_reelles.map(img => img.url).sort(() => Math.random() - 0.5);
                         this.poolIA = r_ia.map(img => img.url).sort(() => Math.random() - 0.5);
                         this.screen = 'intro';
-                    } catch (err) { this.errorMessage = err.message; this.screen = 'error'; }
-                    this.$nextTick(() => lucide.createIcons());
+                        this.$nextTick(() => lucide.createIcons());
+                    } catch (err) {
+                        this.errorMessage = err.message;
+                        this.screen = 'error';
+                        this.$nextTick(() => lucide.createIcons());
+                    }
                 },
 
                 startTest() {
-                    if (!this.userData.age || !this.userData.email) return alert("Champs obligatoires manquants.");
+                    if (!this.userData.email || !this.userData.age) return alert("Veuillez remplir les champs obligatoires.");
                     this.screen = 'test';
                     this.startTimer();
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 startTimer() {
-                    clearInterval(this.timer);
+                    if (this.timer) clearInterval(this.timer);
                     this.timeLeft = 30;
                     this.startTime = Date.now();
                     this.timer = setInterval(() => {
                         this.timeLeft--;
-                        if (this.timeLeft <= 0) { clearInterval(this.timer); this.nextImage(true); }
+                        if (this.timeLeft <= 0) {
+                            clearInterval(this.timer);
+                            this.nextImage(true);
+                        }
                     }, 1000);
                 },
 
@@ -232,41 +350,95 @@
 
                 handleKnowledge(known) {
                     if (known) {
-                        let newUrl = (this.currentImage.type === 'Réelle') ? this.poolReal.pop() : this.poolIA.pop();
-                        if (newUrl) this.images[this.currentIdx].url = newUrl;
+                        const type = this.currentImage.type;
+                        const pool = type === 'Réelle' ? this.poolReal : this.poolIA;
+                        const newUrl = pool.pop();
+                        if (newUrl) {
+                            this.images[this.currentIdx].url = newUrl;
+                            // Reset to Phase 1 for the replacement image
+                            this.isResponding = false;
+                            this.isKnowledgeCheck = true;
+                            this.startTimer();
+                            this.$nextTick(() => lucide.createIcons());
+                            return;
+                        }
                     }
                     this.isKnowledgeCheck = false;
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 toggleReason(label) {
-                    if (this.selectedReasons.includes(label)) this.selectedReasons = this.selectedReasons.filter(x => x !== label);
-                    else this.selectedReasons.push(label);
+                    if (this.selectedReasons.includes(label)) {
+                        this.selectedReasons = this.selectedReasons.filter(r => r !== label);
+                    } else {
+                        this.selectedReasons.push(label);
+                    }
                 },
 
                 nextImage(isTimeout = false) {
-                    if (!isTimeout && !this.prediction && this.isResponding) return alert("Choisissez Réelle ou IA");
-                    this.saveResult(isTimeout ? "Timeout" : this.prediction);
-                    this.currentIdx++;
-                    if (this.currentIdx >= this.images.length) { clearInterval(this.timer); this.screen = 'survey'; }
-                    else { this.isResponding = false; this.isKnowledgeCheck = true; this.prediction = null; this.selectedReasons = []; this.startTimer(); }
+                    if (!isTimeout && !this.prediction && this.isResponding && !this.isKnowledgeCheck) return alert("Veuillez choisir Réelle ou IA");
+                    
+                    this.saveResult(isTimeout ? "Pas de réponse" : (this.prediction || "Pas de réponse"));
+                    
+                    if (this.currentIdx + 1 >= this.images.length) {
+                        clearInterval(this.timer);
+                        this.screen = 'survey';
+                    } else {
+                        this.currentIdx++;
+                        this.prediction = null;
+                        this.selectedReasons = [];
+                        this.confidence = 50;
+                        this.isKnowledgeCheck = true;
+                        this.isResponding = false;
+                        this.responseTime = null;
+                        this.startTimer();
+                    }
                     this.$nextTick(() => lucide.createIcons());
                 },
 
                 saveResult(pred) {
                     const data = {
                         date: new Date().toLocaleString('fr-FR'),
-                        email: this.userData.email, img_url: this.currentImage.url, type: this.currentImage.type,
-                        prediction: pred, temps_rep: this.responseTime ? this.responseTime.toFixed(2) : "30.00", 
-                        raison: this.selectedReasons.join(', '), confiance: this.confidence
+                        email: this.userData.email,
+                        age: this.userData.age,
+                        genre: this.userData.sex,
+                        domaine: this.userData.expertise,
+                        img_url: this.currentImage.url,
+                        type: this.currentImage.type,
+                        prediction: pred,
+                        temps_rep: this.responseTime ? this.responseTime.toFixed(2) : "30.00",
+                        raison: this.selectedReasons.join(', '),
+                        confiance: this.confidence
                     };
-                    fetch(SCRIPT_URL_RESULTS, { method: "POST", mode: 'no-cors', body: JSON.stringify(data) });
+
+                    fetch(this.SCRIPT_URL_RESULTS, {
+                        method: "POST",
+                        mode: 'no-cors',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    });
                 },
 
                 finishTest() {
-                    const finalData = { ...this.userData, ...this.surveyData };
-                    fetch(SCRIPT_URL_USER, { method: "POST", mode: 'no-cors', body: JSON.stringify(finalData) });
+                    const finalData = {
+                        ...this.userData,
+                        difficulty: this.surveyData.difficulty,
+                        enoughTime: this.surveyData.enoughTime
+                    };
+
+                    fetch(this.SCRIPT_URL_USER, {
+                        method: "POST",
+                        mode: 'no-cors',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(finalData)
+                    });
+
                     this.screen = 'finish';
                     this.$nextTick(() => lucide.createIcons());
+                },
+
+                get currentImage() {
+                    return this.images[this.currentIdx] || { url: '', type: '' };
                 }
             }
         }
