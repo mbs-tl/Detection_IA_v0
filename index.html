@@ -21,92 +21,49 @@
     <template x-if="screen === 'loading'"><div class="text-center"><div class="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div><p class="text-zinc-600">Chargement...</p></div></template>
     <template x-if="screen === 'error'"><div class="text-center p-8 bg-white rounded-3xl shadow-xl"><i data-lucide="alert-circle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i><p x-text="errorMessage"></p><button @click="location.reload()" class="mt-4 bg-zinc-900 text-white px-6 py-2 rounded-xl">Réessayer</button></div></template>
 
-    <!-- INTRODUCTION & QUESTIONNAIRE -->
+    <!-- INTRODUCTION -->
     <template x-if="screen === 'intro'">
         <div class="w-full max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-zinc-100 flex flex-col md:flex-row">
-            
-            <!-- COLONNE GAUCHE : CONSIGNES -->
             <div class="md:w-1/2 p-8 md:p-12 bg-indigo-600 text-white">
                 <div class="flex items-center gap-3 mb-8">
                     <i data-lucide="brain-circuit" class="w-10 h-10"></i>
                     <h1 class="text-3xl font-bold">Étude de Perception</h1>
                 </div>
-
                 <div class="space-y-6 text-indigo-100">
                     <div class="bg-indigo-700/50 p-6 rounded-2xl border border-indigo-400/30">
                         <h2 class="text-white font-bold mb-3 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5"></i> Votre tâche</h2>
                         <p class="text-sm leading-relaxed">
-                            Vous allez voir des images. Votre tâche est de dire si l’image est <b>réelle</b> ou <b>générée/modifiée par une IA</b>.<br><br>
-                            Dans certaines phases, vous verrez l’avis d’un modèle d’IA : il se trompe parfois. Faites de votre mieux, ce n’est pas un test de performance.<br><br>
-                            Il n’y a aucune bonne ou mauvaise réponse individuelle : nous étudions des tendances globales.
+                            Vous allez voir des images. Votre tâche est de dire si l’image est <b>réelle</b> ou <b>générée par une IA</b>.<br><br>
+                            Il n’y a aucune bonne ou mauvaise réponse : nous étudions des tendances globales.
                         </p>
                     </div>
-
                     <div class="space-y-4">
                         <h2 class="text-white font-bold flex items-center gap-2"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Consignes</h2>
                         <ul class="text-sm space-y-3">
                             <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">1</span> <span>Identifiez si l'image est réelle ou générée par IA.</span></li>
-                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">2</span> <span>Vous avez 20 secondes par image.</span></li>
-                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">3</span> <span>Si vous connaissez l'image, elle sera remplacée.</span></li>
+                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">2</span> <span>Vous avez <b>30 secondes</b> par image.</span></li>
+                            <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">3</span> <span>Cliquez sur "Répondre" dès que vous avez une idée.</span></li>
                         </ul>
                     </div>
-
-                    <p class="text-xs italic opacity-70 mt-8">
-                        Tout sera anonymisé ! Nous avons besoin de votre adresse mail uniquement pour la validation de vos crédits/participation.
-                    </p>
                 </div>
             </div>
-
-            <!-- COLONNE DROITE : QUESTIONNAIRE -->
             <div class="md:w-1/2 p-8 md:p-12 overflow-y-auto max-h-[90vh]">
                 <h2 class="text-2xl font-bold mb-6">Questionnaire initial</h2>
-                
                 <div class="space-y-6">
-                    <!-- Infos de base -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div><label class="label-text">E-mail</label><input type="email" x-model="userData.email" class="input-field" placeholder="votre@email.com"></div>
                         <div><label class="label-text">Âge</label><input type="number" x-model="userData.age" class="input-field" placeholder="Ex: 25"></div>
                         <div><label class="label-text">Sexe</label><select x-model="userData.sex" class="input-field"><option value="Homme">Homme</option><option value="Femme">Femme</option><option value="Autre">Autre</option></select></div>
                         <div><label class="label-text">Expertise</label><input type="text" x-model="userData.expertise" class="input-field" placeholder="Ex: Data"></div>
                     </div>
-
                     <hr class="border-zinc-100">
-                    <p class="text-sm font-bold text-indigo-600">Au cours des dernières 24 heures...</p>
-
-                    <!-- Questions physiologiques -->
                     <div class="space-y-4">
-                        <div>
-                            <label class="label-text">Sommeil suffisant ? (0-10)</label>
-                            <div class="flex items-center gap-4">
-                                <input type="range" min="0" max="10" x-model="userData.sleep" class="flex-1 h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
-                                <span class="w-8 text-center font-bold text-indigo-600" x-text="userData.sleep"></span>
-                            </div>
-                        </div>
-
+                        <div><label class="label-text">Sommeil (0-10)</label><input type="range" min="0" max="10" x-model="userData.sleep" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer"></div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="label-text">Consommé de l'alcool ?</label><select x-model="userData.alcohol" class="input-field"><option value="non">Non</option><option value="oui">Oui</option></select></div>
-                            <div><label class="label-text">Psychotropes / Médocs ?</label><select x-model="userData.meds" class="input-field"><option value="non">Non</option><option value="oui">Oui</option></select></div>
-                        </div>
-
-                        <div>
-                            <label class="label-text">Niveau de fatigue ? (0-10)</label>
-                            <div class="flex items-center gap-4">
-                                <input type="range" min="0" max="10" x-model="userData.fatigue" class="flex-1 h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
-                                <span class="w-8 text-center font-bold text-indigo-600" x-text="userData.fatigue"></span>
-                            </div>
-                        </div>
-
-                        <div><label class="label-text">Symptômes de maladie ?</label><select x-model="userData.illness" class="input-field"><option value="non">Non</option><option value="oui">Oui</option></select></div>
-
-                        <div>
-                            <label class="label-text">Niveau de concentration ? (0-10)</label>
-                            <div class="flex items-center gap-4">
-                                <input type="range" min="0" max="10" x-model="userData.focus" class="flex-1 h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
-                                <span class="w-8 text-center font-bold text-indigo-600" x-text="userData.focus"></span>
-                            </div>
+                            <div><label class="label-text">Alcool ?</label><select x-model="userData.alcohol" class="input-field"><option value="non">Non</option><option value="oui">Oui</option></select></div>
+                            <div><label class="label-text">Fatigue (0-10)</label><input type="range" min="0" max="10" x-model="userData.fatigue" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer"></div>
                         </div>
                     </div>
-
                     <button @click="startTest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2">
                         Valider et Commencer <i data-lucide="play" class="w-5 h-5"></i>
                     </button>
@@ -115,7 +72,7 @@
         </div>
     </template>
 
-    <!-- TEST SCREEN (Inchangé mais inclus pour complétude) -->
+    <!-- TEST SCREEN -->
     <template x-if="screen === 'test'">
         <div class="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="relative">
@@ -130,37 +87,65 @@
                     <span class="text-sm font-medium text-zinc-400" x-text="'Image ' + (currentIdx + 1) + ' / ' + images.length"></span>
                 </div>
             </div>
+
             <div class="bg-white rounded-3xl shadow-xl p-8 border border-zinc-100 flex flex-col min-h-[500px]">
-                <div x-show="isKnowledgeCheck" class="flex-1 flex flex-col justify-center text-center">
-                    <h3 class="text-xl font-bold mb-4">Connaissez-vous cette image ?</h3>
-                    <div class="grid grid-cols-1 gap-4">
-                        <button @click="handleKnowledge(true)" class="bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg">Oui, je la connais</button>
-                        <button @click="handleKnowledge(false)" class="bg-white border-2 border-zinc-100 font-bold py-4 rounded-2xl">Non, jamais vue</button>
-                    </div>
+                <!-- PHASE 1 : BOUTON RÉPONDRE -->
+                <div x-show="!isResponding" class="flex-1 flex flex-col justify-center items-center text-center space-y-6">
+                    <h3 class="text-2xl font-bold">Analysez l'image</h3>
+                    <p class="text-zinc-500">Cliquez sur le bouton dès que vous avez une idée.</p>
+                    <button @click="handleRespondClick()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-2xl shadow-xl text-xl">
+                        Répondre
+                    </button>
                 </div>
-                <div x-show="!isKnowledgeCheck" class="flex-1 flex flex-col" x-cloak>
-                    <h2 class="text-xl font-bold mb-6">Réelle ou IA ?</h2>
-                    <div class="grid grid-cols-2 gap-4 mb-8">
-                        <button @click="prediction = 'Réelle'" :class="prediction === 'Réelle' ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">Réelle</button>
-                        <button @click="prediction = 'IA'" :class="prediction === 'IA' ? 'bg-amber-50 border-amber-500 text-amber-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">IA</button>
-                    </div>
-                    <div x-show="prediction === 'IA'" class="mb-8">
-                        <p class="text-sm font-bold mb-3">Pourquoi ?</p>
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="r in REASONS" :key="r.id">
-                                <button @click="toggleReason(r.label)" :class="selectedReasons.includes(r.label) ? 'bg-indigo-600 text-white' : 'bg-zinc-50 text-zinc-600'" class="px-3 py-2 rounded-xl text-xs font-medium border" x-text="r.label"></button>
-                            </template>
+
+                <!-- PHASE 2 : QUESTIONS -->
+                <div x-show="isResponding" class="flex-1 flex flex-col" x-cloak>
+                    <div x-show="isKnowledgeCheck" class="flex-1 flex flex-col justify-center text-center">
+                        <h3 class="text-xl font-bold mb-6">Connaissez-vous cette image ?</h3>
+                        <div class="grid grid-cols-1 gap-4">
+                            <button @click="handleKnowledge(true)" class="bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg">Oui, je la connais</button>
+                            <button @click="handleKnowledge(false)" class="bg-white border-2 border-zinc-100 font-bold py-4 rounded-2xl">Non, jamais vue</button>
                         </div>
                     </div>
-                    <div class="space-y-4 mb-8">
-                        <div class="flex justify-between items-center text-sm font-bold">
-                            <label>Confiance</label>
-                            <span class="text-indigo-600" x-text="confidence + '%'"></span>
+                    <div x-show="!isKnowledgeCheck" class="flex-1 flex flex-col">
+                        <h2 class="text-xl font-bold mb-6">Réelle ou IA ?</h2>
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <button @click="prediction = 'Réelle'" :class="prediction === 'Réelle' ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">Réelle</button>
+                            <button @click="prediction = 'IA'" :class="prediction === 'IA' ? 'bg-amber-50 border-amber-500 text-amber-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-4 rounded-2xl font-bold border-2 transition-all">IA</button>
                         </div>
-                        <input type="range" min="0" max="100" x-model="confidence" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between items-center text-sm font-bold"><label>Confiance</label><span class="text-indigo-600" x-text="confidence + '%'"></span></div>
+                            <input type="range" min="0" max="100" x-model="confidence" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <button @click="nextImage(false)" class="mt-auto w-full bg-zinc-900 text-white font-bold py-4 rounded-2xl">Suivant</button>
                     </div>
-                    <button @click="nextImage(false)" class="mt-auto w-full bg-zinc-900 text-white font-bold py-4 rounded-2xl">Suivant</button>
                 </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- SONDAGE FINAL -->
+    <template x-if="screen === 'survey'">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-zinc-100">
+            <h2 class="text-2xl font-bold mb-8 text-center">Quelques questions finales</h2>
+            <div class="space-y-8">
+                <div>
+                    <label class="label-text block mb-4">Avez-vous trouvé ce test :</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <template x-for="opt in ['Facile', 'Moyenne', 'Difficile']">
+                            <button @click="surveyData.difficulty = opt" :class="surveyData.difficulty === opt ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-3 rounded-xl text-sm font-bold border-2" x-text="opt"></button>
+                        </template>
+                    </div>
+                </div>
+                <div>
+                    <label class="label-text block mb-4">Avez-vous eu suffisamment de temps ?</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <template x-for="opt in ['Oui', 'Non']">
+                            <button @click="surveyData.enoughTime = opt" :class="surveyData.enoughTime === opt ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" class="py-3 rounded-xl text-sm font-bold border-2" x-text="opt"></button>
+                        </template>
+                    </div>
+                </div>
+                <button @click="finishTest()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg mt-4">Terminer l'étude</button>
             </div>
         </div>
     </template>
@@ -170,34 +155,23 @@
         <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-12 text-center border border-zinc-100">
             <i data-lucide="check-circle-2" class="w-16 h-16 text-emerald-500 mx-auto mb-6"></i>
             <h2 class="text-3xl font-bold mb-4">Terminé !</h2>
-            <p class="text-zinc-500 mb-8">Merci pour votre précieuse contribution.</p>
+            <p class="text-zinc-500 mb-8">Merci pour votre contribution.</p>
             <button @click="location.reload()" class="w-full bg-zinc-100 font-bold py-4 rounded-xl">Recommencer</button>
         </div>
     </template>
 
     <script>
-        // CONFIGURATION
         const SCRIPT_URL_RESULTS = "https://script.google.com/macros/s/AKfycbxIv2QgH6vGyC6YZ4ecA2rlZ5jxG4gloXzWhr7yCpupw9p4GdCxJi10xlFozPr_qNDVxg/exec";
         const SCRIPT_URL_USER = "https://script.google.com/macros/s/AKfycbwq3Uj4JHrDxz9SCYJfcMa0BclxX1a2lcFiAPm2lMTltbPdoywYlGhJ3y_OaexpmjsN/exec";
         const REPO_PATH = "mbs-tl/Detection_IA_v0";
 
-        const REASONS = [
-            { id: 'lighting', label: 'Éclairage' }, { id: 'background', label: 'Arrière-plan' },
-            { id: 'anatomy', label: 'Anatomie' }, { id: 'objects', label: 'Objets' },
-            { id: 'cohesiveness', label: 'Cohérence' }, { id: 'textures', label: 'Textures' },
-            { id: 'other', label: 'Autre' }
-        ];
-
         function testApp() {
             return {
                 screen: 'loading',
-                userData: { 
-                    age: '', sex: 'Homme', email: '', expertise: '',
-                    sleep: 5, alcohol: 'non', meds: 'non', fatigue: 5, illness: 'non', focus: 5
-                },
-                images: [], poolReal: [], poolIA: [], currentIdx: 0, timeLeft: 20, timer: null, startTime: null,
-                prediction: null, selectedReasons: [], confidence: 50, isKnowledgeCheck: true,
-                errorMessage: '', REASONS: REASONS,
+                userData: { age: '', sex: 'Homme', email: '', expertise: '', sleep: 5, alcohol: 'non', meds: 'non', fatigue: 5, illness: 'non', focus: 5 },
+                surveyData: { difficulty: 'Moyenne', enoughTime: 'Oui' },
+                images: [], poolReal: [], poolIA: [], currentIdx: 0, timeLeft: 30, timer: null, startTime: null, responseTime: null,
+                prediction: null, confidence: 50, isKnowledgeCheck: true, isResponding: false, errorMessage: '',
 
                 get currentImage() { return this.images[this.currentIdx] || { url: '', type: '' }; },
 
@@ -205,7 +179,6 @@
                     try {
                         const fetchFolder = async (path, type) => {
                             const res = await fetch(`https://api.github.com/repos/${REPO_PATH}/contents/${path}`);
-                            if (!res.ok) throw new Error(`Dossier ${path} non trouvé`);
                             const files = await res.json();
                             return files.filter(f => /\.(jpe?g|png|webp)$/i.test(f.name)).map(f => ({ url: f.download_url, type }));
                         };
@@ -218,38 +191,18 @@
                         this.poolIA = r_ia.map(img => img.url).sort(() => Math.random() - 0.5);
                         this.screen = 'intro';
                     } catch (err) { this.errorMessage = err.message; this.screen = 'error'; }
-                    this.$watch('screen', () => this.$nextTick(() => lucide.createIcons()));
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 startTest() {
-                    if (!this.userData.age || !this.userData.email) return alert("Veuillez remplir les champs obligatoires.");
-                    
-                    // Envoi du profil utilisateur au 2ème Sheet
-                    fetch(SCRIPT_URL_USER, {
-                        method: "POST",
-                        mode: 'no-cors',
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(this.userData)
-                    });
-
+                    if (!this.userData.age || !this.userData.email) return alert("Champs obligatoires manquants.");
                     this.screen = 'test';
-                    this.resetTimer();
+                    this.startTimer();
                 },
 
-                handleKnowledge(known) {
-                    if (known) {
-                        const type = this.currentImage.type;
-                        let newUrl = (type === 'Réelle') ? this.poolReal.pop() : this.poolIA.pop();
-                        if (newUrl) this.images[this.currentIdx].url = newUrl;
-                    }
-                    this.isKnowledgeCheck = false;
-                    this.resetTimer();
-                },
-
-                resetTimer() {
+                startTimer() {
                     clearInterval(this.timer);
-                    this.timeLeft = 20;
-                    if (this.isKnowledgeCheck) return;
+                    this.timeLeft = 30;
                     this.startTime = Date.now();
                     this.timer = setInterval(() => {
                         this.timeLeft--;
@@ -257,32 +210,42 @@
                     }, 1000);
                 },
 
-                toggleReason(label) {
-                    if (this.selectedReasons.includes(label)) this.selectedReasons = this.selectedReasons.filter(x => x !== label);
-                    else this.selectedReasons.push(label);
+                handleRespondClick() {
+                    this.responseTime = (Date.now() - this.startTime) / 1000;
+                    this.isResponding = true;
+                },
+
+                handleKnowledge(known) {
+                    if (known) {
+                        let newUrl = (this.currentImage.type === 'Réelle') ? this.poolReal.pop() : this.poolIA.pop();
+                        if (newUrl) this.images[this.currentIdx].url = newUrl;
+                    }
+                    this.isKnowledgeCheck = false;
                 },
 
                 nextImage(isTimeout = false) {
-                    if (!isTimeout && !this.prediction) return alert("Veuillez choisir Réelle ou IA");
-                    this.saveResult(isTimeout ? "Pas de réponse" : this.prediction);
+                    if (!isTimeout && !this.prediction && this.isResponding) return alert("Choisissez Réelle ou IA");
+                    this.saveResult(isTimeout ? "Timeout" : this.prediction);
                     this.currentIdx++;
-                    if (this.currentIdx >= this.images.length) { clearInterval(this.timer); this.screen = 'finish'; }
-                    else { this.prediction = null; this.selectedReasons = []; this.confidence = 50; this.isKnowledgeCheck = true; this.resetTimer(); }
+                    if (this.currentIdx >= this.images.length) { clearInterval(this.timer); this.screen = 'survey'; }
+                    else { this.isResponding = false; this.isKnowledgeCheck = true; this.prediction = null; this.startTimer(); }
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 saveResult(pred) {
-                    const elapsed = this.startTime ? (Date.now() - this.startTime) / 1000 : 20;
                     const data = {
                         date: new Date().toLocaleString('fr-FR'),
-                        email: this.userData.email, age: this.userData.age, genre: this.userData.sex, domaine: this.userData.expertise,
-                        img_url: this.currentImage.url, type: this.currentImage.type,
-                        prediction: pred, temps_rep: elapsed.toFixed(2), raison: this.selectedReasons.join(', '), confiance: this.confidence
+                        email: this.userData.email, img_url: this.currentImage.url, type: this.currentImage.type,
+                        prediction: pred, temps_rep: this.responseTime ? this.responseTime.toFixed(2) : "30.00", confiance: this.confidence
                     };
-                    fetch(SCRIPT_URL_RESULTS, {
-                        method: "POST", mode: 'no-cors',
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(data)
-                    });
+                    fetch(SCRIPT_URL_RESULTS, { method: "POST", mode: 'no-cors', body: JSON.stringify(data) });
+                },
+
+                finishTest() {
+                    const finalData = { ...this.userData, ...this.surveyData };
+                    fetch(SCRIPT_URL_USER, { method: "POST", mode: 'no-cors', body: JSON.stringify(finalData) });
+                    this.screen = 'finish';
+                    this.$nextTick(() => lucide.createIcons());
                 }
             }
         }
