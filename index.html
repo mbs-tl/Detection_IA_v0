@@ -55,7 +55,7 @@
                             <li class="flex items-start gap-3"><span class="bg-white/20 px-2 rounded">3</span> <span>Cliquez sur "Répondre" dès que vous avez une idée. L'image disparaîtra alors.</span></li>
                         </ul>
                     </div>
-                    <p class="text-xs italic opacity-70 mt-8">Tout sera anonymisé ! Votre mail sert uniquement à la validation des CRA.</p>
+                    <p class="text-xs italic opacity-70 mt-8">Tout sera anonymisé ! Votre mail sert uniquement à la validation.</p>
                 </div>
             </div>
 
@@ -93,7 +93,7 @@
                             <label class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3 block leading-relaxed">
                                 Auriez-vous été sujet à l’une de ces situations au cours des dernières 24h : manque de sommeil, consommation de substances, dépression, ..... ?
                             </label>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-3 gap-4">
                                 <button 
                                     @click="userData.recentIssues = 'oui'" 
                                     :class="userData.recentIssues === 'oui' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" 
@@ -108,6 +108,13 @@
                                 >
                                     Non
                                 </button>
+                                <button 
+                                    @click="userData.recentIssues = 'prefere_pas'" 
+                                    :class="userData.recentIssues === 'prefere_pas' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-100 text-zinc-400'" 
+                                    class="py-3 rounded-xl text-sm font-bold border-2 transition-all"
+                                >
+                                    Ne pas répondre
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -115,6 +122,85 @@
                     <button @click="startTest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
                         Valider et Commencer <i data-lucide="play" class="w-5 h-5"></i>
                     </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- DEMO -->
+    <template x-if="screen === 'demo'">
+        <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl border border-zinc-100 overflow-hidden p-8 md:p-12">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-indigo-600 mb-2">Comment ça marche ?</h2>
+                <p class="text-zinc-500">Voici une courte démonstration avant de commencer.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div :class="demoStep === 1 ? 'opacity-100 scale-105' : 'opacity-40 scale-95'" class="flex items-start gap-4 transition-all duration-500">
+                        <div class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">1</div>
+                        <div>
+                            <h3 class="font-bold text-lg">Phase d'Observation</h3>
+                            <p class="text-sm text-zinc-600">Analysez attentivement l'image qui s'affiche. Cherchez des indices sur l'éclairage, les textures ou d'éventuelles anomalies. Vous disposez de <strong>30 secondes</strong> maximum.</p>
+                        </div>
+                    </div>
+                    <div :class="demoStep === 2 ? 'opacity-100 scale-105' : 'opacity-40 scale-95'" class="flex items-start gap-4 transition-all duration-500">
+                        <div class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">2</div>
+                        <div>
+                            <h3 class="font-bold text-lg">Prise de Décision</h3>
+                            <p class="text-sm text-zinc-600">Dès que vous avez une intuition, cliquez sur <strong>"Répondre"</strong>. À cet instant, <strong>l'image disparaît</strong> pour que votre jugement repose sur votre perception mémorisée.</p>
+                        </div>
+                    </div>
+                    <div :class="demoStep === 3 ? 'opacity-100 scale-105' : 'opacity-40 scale-95'" class="flex items-start gap-4 transition-all duration-500">
+                        <div class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">3</div>
+                        <div>
+                            <h3 class="font-bold text-lg">Évaluation Finale</h3>
+                            <p class="text-sm text-zinc-600">Tranchez entre <strong>Réelle</strong> ou <strong>IA</strong>. Si c'est une IA, indiquez vos raisons. Enfin, évaluez votre <strong>degré de confiance</strong> de 50% à 100%.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-50 rounded-3xl p-6 border-2 border-dashed border-zinc-200 relative">
+                    <template x-if="demoStep === 1">
+                        <div class="space-y-4">
+                            <div class="aspect-video bg-zinc-200 rounded-xl overflow-hidden relative">
+                                <img src="https://picsum.photos/seed/demo/800/450" class="w-full h-full object-cover">
+                                <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold">28s</div>
+                            </div>
+                            <button @click="demoStep = 2" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg animate-bounce">Répondre</button>
+                        </div>
+                    </template>
+                    <template x-if="demoStep === 2">
+                        <div class="space-y-4 text-center py-8">
+                            <div class="aspect-video bg-zinc-100 rounded-xl flex flex-col items-center justify-center text-zinc-400 border-2 border-zinc-200">
+                                <i data-lucide="eye-off" class="w-12 h-12 mb-2"></i>
+                                <span class="text-xs font-bold uppercase tracking-widest">Image Masquée</span>
+                            </div>
+                            <p class="text-sm font-medium text-indigo-600">L'image est maintenant cachée.</p>
+                            <button @click="demoStep = 3" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl">Continuer</button>
+                        </div>
+                    </template>
+                    <template x-if="demoStep === 3">
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="p-3 border-2 border-zinc-100 bg-white rounded-xl text-center text-xs font-bold text-zinc-400">Réelle</div>
+                                <div class="p-3 border-2 border-amber-500 bg-amber-50 rounded-xl text-center text-xs font-bold text-amber-700">IA</div>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-[10px] font-bold text-zinc-500 uppercase">Pourquoi ? (si IA)</p>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 rounded-lg bg-indigo-600 text-white text-[8px]">Éclairage</span>
+                                    <span class="px-2 py-1 rounded-lg bg-zinc-100 text-zinc-600 text-[8px]">Anatomie</span>
+                                    <span class="px-2 py-1 rounded-lg bg-zinc-100 text-zinc-600 text-[8px]">...</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px] font-bold text-zinc-500 uppercase"><span>Confiance</span> <span>85%</span></div>
+                                <div class="h-1.5 bg-zinc-200 rounded-full overflow-hidden"><div class="h-full bg-indigo-600 w-[85%]"></div></div>
+                            </div>
+                            <button @click="startRealTest()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-xl active:scale-95 transition-transform">J'ai compris, c'est parti !</button>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -189,7 +275,7 @@
                                         <label class="text-zinc-500 uppercase">Confiance</label>
                                         <span class="text-indigo-600" x-text="confidence + '%'"></span>
                                     </div>
-                                    <input type="range" min="0" max="100" x-model="confidence" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
+                                    <input type="range" min="50" max="100" x-model="confidence" class="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer">
                                 </div>
 
                                 <button @click="nextImage()" class="mt-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
@@ -248,6 +334,7 @@
                 SCRIPT_URL_RESULTS: "https://script.google.com/macros/s/AKfycbxW4heymcZpYRLclV5iJJT_k4i6epIup-Dar4rvVd3rjryC6_YZSA9F8yBJEkSj9UpIbw/exec",
                 SCRIPT_URL_USER: "https://script.google.com/macros/s/AKfycbzrS_A9tQFc8rLFyN-Yyu2cyIAbDP0YnD4E92CDONjEy_6teguWOqcBetjfrzevaFRa/exec",
                 
+
                 userData: { email: '', age: '', sex: 'Homme', expertise: '', recentIssues: 'non' },
                 surveyData: { difficulty: 'Moyenne', enoughTime: 'Oui' },
                 
@@ -261,9 +348,10 @@
                 isKnowledgeCheck: true,
                 prediction: null,
                 selectedReasons: [],
-                confidence: 50,
+                confidence: 75, // Start in the middle of 50-100
                 startTime: null,
                 responseTime: null,
+                demoStep: 0,
                 
                 reasons: [
                     { id: 'lighting', label: 'Éclairage' }, { id: 'background', label: 'Arrière-plan' },
@@ -308,7 +396,14 @@
 
                 startTest() {
                     if (!this.userData.email || !this.userData.age) return alert("Veuillez remplir les champs obligatoires.");
+                    this.screen = 'demo';
+                    this.demoStep = 1;
+                    this.$nextTick(() => lucide.createIcons());
+                },
+
+                startRealTest() {
                     this.screen = 'test';
+                    this.currentIdx = 0;
                     this.startTimer();
                     this.$nextTick(() => lucide.createIcons());
                 },
@@ -321,12 +416,13 @@
                         this.timeLeft--;
                         if (this.timeLeft <= 0) {
                             clearInterval(this.timer);
-                            this.nextImage(true);
+                            this.handleRespondClick(); // Force the response phase if time is up
                         }
                     }, 1000);
                 },
 
                 handleRespondClick() {
+                    if (this.timer) clearInterval(this.timer); // Stop timer immediately
                     this.responseTime = (Date.now() - this.startTime) / 1000;
                     this.isResponding = true;
                     this.$nextTick(() => lucide.createIcons());
@@ -360,18 +456,18 @@
                 },
 
                 nextImage(isTimeout = false) {
-                    if (!isTimeout && !this.prediction && this.isResponding && !this.isKnowledgeCheck) return alert("Veuillez choisir Réelle ou IA");
+                    if (!this.prediction && this.isResponding && !this.isKnowledgeCheck) return alert("Veuillez choisir Réelle ou IA");
                     
-                    this.saveResult(isTimeout ? "Pas de réponse" : (this.prediction || "Pas de réponse"));
+                    this.saveResult(this.prediction);
                     
                     if (this.currentIdx + 1 >= this.images.length) {
-                        clearInterval(this.timer);
+                        if (this.timer) clearInterval(this.timer);
                         this.screen = 'survey';
                     } else {
                         this.currentIdx++;
                         this.prediction = null;
                         this.selectedReasons = [];
-                        this.confidence = 50;
+                        this.confidence = 75;
                         this.isKnowledgeCheck = true;
                         this.isResponding = false;
                         this.responseTime = null;
